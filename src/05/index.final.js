@@ -9,12 +9,8 @@ const assignPoint = assign({
 });
 
 const assignPosition = assign({
-  x: (context, event) => {
-    return context.x + context.dx;
-  },
-  y: (context, event) => {
-    return context.y + context.dy;
-  },
+  x: (context, event) => context.x + context.dx,
+  y: (context, event) => context.y + context.dy,
   dx: 0,
   dy: 0,
   px: 0,
@@ -22,12 +18,8 @@ const assignPosition = assign({
 });
 
 const assignDelta = assign({
-  dx: (context, event) => {
-    return event.clientX - context.px;
-  },
-  dy: (context, event) => {
-    return event.clientY - context.py;
-  },
+  dx: (context, event) => event.clientX - context.px,
+  dy: (context, event) => event.clientY - context.py,
 });
 
 const showDelta = (context) => {
