@@ -25,7 +25,7 @@ const setRestingPosition = assign({
   py: 0,
 });
 
-const resume = assign({
+const resumePosition = assign({
   x: 0,
   y: 0,
   dx: 0,
@@ -53,7 +53,7 @@ const machine = createMachine({
         },
         'keyup.Escape': {
           target: 'idle',
-          actions: [resume, resumeDelta],
+          actions: [resumePosition, resumeDelta],
         },
       },
     },
@@ -75,10 +75,7 @@ const service = interpret(machine);
 
 service.onTransition((state) => {
   if (state.changed) {
-    console.log(state.context);
-
     elBox.dataset.state = state.value;
-
     elBox.style.setProperty('--dx', state.context.dx);
     elBox.style.setProperty('--dy', state.context.dy);
     elBox.style.setProperty('--x', state.context.x);
