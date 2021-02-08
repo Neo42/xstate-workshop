@@ -56,11 +56,11 @@ const machine = createMachine({
           target: 'idle',
           actions: resetPosition,
         },
-        mousedown: [{
+        mousedown: {
           target: 'dragging',
           actions: assignPoint,
           cond: ({ drags }) => drags > 0,
-        }],
+        },
       },
     },
     dragging: {
@@ -69,10 +69,10 @@ const machine = createMachine({
         mousemove: {
           actions: assignDelta,
         },
-        mouseup: [{
+        mouseup: {
           actions: assignPosition,
           target: 'idle',
-        }],
+        },
       },
     },
   },
