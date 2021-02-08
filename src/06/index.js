@@ -8,7 +8,7 @@ const assignDrags = assign({
 });
 
 const dragsExceeded = assign({
-  drags: 'No',
+  drags: 'no',
 });
 
 const assignPoint = assign({
