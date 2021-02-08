@@ -8,9 +8,6 @@ const setDelta = assign({
   dy: ({ py }, event) => event.clientY - py,
 });
 
-const showDelta = ({ dx, dy }) => { elBox.dataset.delta = `delta: (${dx}, ${dy})`; };
-const resumeDelta = () => { elBox.dataset.delta = 'delta: (0, 0)'; };
-
 const setPosition = assign({
   px: (_, event) => event.clientX,
   py: (_, event) => event.clientY,
@@ -30,9 +27,15 @@ const resumePosition = assign({
   y: 0,
   dx: 0,
   dy: 0,
-  px: 0,
-  py: 0,
 });
+
+const resumeDelta = () => {
+  elBox.dataset.delta = 'delta: (0, 0)';
+};
+
+const showDelta = ({ dx, dy }) => {
+  elBox.dataset.delta = `delta: (${dx}, ${dy})`;
+};
 
 const machine = createMachine({
   initial: 'idle',

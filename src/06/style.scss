@@ -9,7 +9,7 @@
   }
 
   &:before {
-    content: attr(data-drags);
+    content: attr(data-drags) ' drags left';
     position: absolute;
     bottom: 100%;
     margin-bottom: 0.5rem;

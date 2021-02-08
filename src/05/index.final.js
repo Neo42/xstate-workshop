@@ -9,8 +9,8 @@ const assignPoint = assign({
 });
 
 const assignPosition = assign({
-  x: (context, event) => context.x + context.dx,
-  y: (context, event) => context.y + context.dy,
+  x: (context) => context.x + context.dx,
+  y: (context) => context.y + context.dy,
   dx: 0,
   dy: 0,
   px: 0,
@@ -100,8 +100,8 @@ elBody.addEventListener('mouseup', (event) => {
   service.send(event);
 });
 
-elBody.addEventListener('keyup', (e) => {
-  if (e.key === 'Escape') {
+elBody.addEventListener('keyup', (event) => {
+  if (event.key === 'Escape') {
     service.send('keyup.escape');
   }
 });

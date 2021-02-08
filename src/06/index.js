@@ -3,18 +3,22 @@ import { createMachine, assign, interpret } from 'xstate';
 const elBox = document.querySelector('#box');
 const elBody = document.body;
 
+const assignDrags = assign({
+  drags: ({ drags }) => drags - 1,
+});
+
+const dragsExceeded = assign({
+  drags: 'No',
+});
+
 const assignPoint = assign({
-  px: (context, event) => event.clientX,
-  py: (context, event) => event.clientY,
+  px: (_, event) => event.clientX,
+  py: (_, event) => event.clientY,
 });
 
 const assignPosition = assign({
-  x: (context, event) => {
-    return context.x + context.dx;
-  },
-  y: (context, event) => {
-    return context.y + context.dy;
-  },
+  x: (context) => context.x + context.dx,
+  y: (context) => context.y + context.dy,
   dx: 0,
   dy: 0,
   px: 0,
@@ -22,19 +26,15 @@ const assignPosition = assign({
 });
 
 const assignDelta = assign({
-  dx: (context, event) => {
-    return event.clientX - context.px;
-  },
-  dy: (context, event) => {
-    return event.clientY - context.py;
-  },
+  dx: (context, event) => event.clientX - context.px,
+  dy: (context, event) => event.clientY - context.py,
 });
 
 const resetPosition = assign({
   dx: 0,
   dy: 0,
-  px: 0,
-  py: 0,
+  x: 0,
+  y: 0,
 });
 
 const machine = createMachine({
@@ -46,35 +46,36 @@ const machine = createMachine({
     dy: 0,
     px: 0,
     py: 0,
-    drags: 0,
+    drags: 5,
   },
   states: {
     idle: {
       on: {
-        mousedown: {
-          // Don't select this transition unless
-          // there are < 5 drags
-          // ...
-          actions: assignPoint,
-          target: 'dragging',
+        'keyup.escape': {
+          target: 'idle',
+          actions: resetPosition,
         },
+        mousedown: [{
+          target: 'dragging',
+          actions: assignPoint,
+          cond: ({ drags }) => drags > 1,
+
+        }, {
+          target: 'idle',
+          actions: dragsExceeded,
+          cond: ({ drags }) => drags === 1,
+        }],
       },
     },
     dragging: {
-      // Whenever we enter this state, we want to
-      // increment the drags count.
-      // ...
+      entry: assignDrags,
       on: {
         mousemove: {
           actions: assignDelta,
         },
         mouseup: {
-          actions: [assignPosition],
+          actions: assignPosition,
           target: 'idle',
-        },
-        'keyup.escape': {
-          target: 'idle',
-          actions: resetPosition,
         },
       },
     },
@@ -85,11 +86,8 @@ const service = interpret(machine);
 
 service.onTransition((state) => {
   if (state.changed) {
-    console.log(state.context);
-
     elBox.dataset.state = state.value;
     elBox.dataset.drags = state.context.drags;
-
     elBox.style.setProperty('--dx', state.context.dx);
     elBox.style.setProperty('--dy', state.context.dy);
     elBox.style.setProperty('--x', state.context.x);
@@ -111,8 +109,8 @@ elBody.addEventListener('mouseup', (event) => {
   service.send(event);
 });
 
-elBody.addEventListener('keyup', (e) => {
-  if (e.key === 'Escape') {
+elBody.addEventListener('keyup', (event) => {
+  if (event.key === 'Escape') {
     service.send('keyup.escape');
   }
 });
