@@ -64,7 +64,7 @@ const machine = createMachine({
       },
     },
     dragging: {
-      entry: assignDrags,
+      exit: assignDrags,
       on: {
         mousemove: {
           actions: assignDelta,
