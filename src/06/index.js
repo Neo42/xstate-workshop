@@ -59,7 +59,6 @@ const machine = createMachine({
           target: 'dragging',
           actions: assignPoint,
           cond: ({ drags }) => drags > 1,
-
         }, {
           target: 'idle',
           actions: dragsExceeded,
