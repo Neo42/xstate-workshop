@@ -8,7 +8,7 @@ const assignDrags = assign({
 });
 
 const dragsExceeded = assign({
-  drags: 'no',
+  drags: ({ drags }) => (drags === 0 ? 'no' : drags),
 });
 
 const assignPoint = assign({
@@ -50,6 +50,7 @@ const machine = createMachine({
   },
   states: {
     idle: {
+      entry: dragsExceeded,
       on: {
         'keyup.escape': {
           target: 'idle',
@@ -58,11 +59,7 @@ const machine = createMachine({
         mousedown: [{
           target: 'dragging',
           actions: assignPoint,
-          cond: ({ drags }) => drags > 1,
-        }, {
-          target: 'idle',
-          actions: dragsExceeded,
-          cond: ({ drags }) => drags === 1,
+          cond: ({ drags }) => drags > 0,
         }],
       },
     },
@@ -72,10 +69,10 @@ const machine = createMachine({
         mousemove: {
           actions: assignDelta,
         },
-        mouseup: {
+        mouseup: [{
           actions: assignPosition,
           target: 'idle',
-        },
+        }],
       },
     },
   },
