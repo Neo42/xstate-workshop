@@ -1,4 +1,7 @@
 import { createMachine, assign, interpret } from 'xstate';
+import { inspect } from '@xstate/inspect';
+
+inspect({ iframe: false });
 
 const elBox = document.querySelector('#box');
 const elBody = document.body;
@@ -56,11 +59,11 @@ const machine = createMachine({
           target: 'idle',
           actions: resetPosition,
         },
-        mousedown: {
+        mousedown: [{
           target: 'dragging',
           actions: assignPoint,
           cond: ({ drags }) => drags > 0,
-        },
+        }],
       },
     },
     dragging: {
@@ -69,29 +72,26 @@ const machine = createMachine({
         mousemove: {
           actions: assignDelta,
         },
-        mouseup: {
+        mouseup: [{
           actions: assignPosition,
           target: 'idle',
-        },
+        }],
       },
     },
   },
 });
 
-const service = interpret(machine);
-
-service.onTransition((state) => {
-  if (state.changed) {
-    elBox.dataset.state = state.value;
-    elBox.dataset.drags = state.context.drags;
-    elBox.style.setProperty('--dx', state.context.dx);
-    elBox.style.setProperty('--dy', state.context.dy);
-    elBox.style.setProperty('--x', state.context.x);
-    elBox.style.setProperty('--y', state.context.y);
-  }
-});
-
-service.start();
+const service = interpret(machine, { devTools: true })
+  .onTransition((state) => {
+    if (state.changed) {
+      elBox.dataset.state = state.value;
+      elBox.dataset.drags = state.context.drags;
+      elBox.style.setProperty('--dx', state.context.dx);
+      elBox.style.setProperty('--dy', state.context.dy);
+      elBox.style.setProperty('--x', state.context.x);
+      elBox.style.setProperty('--y', state.context.y);
+    }
+  }).start();
 
 elBox.addEventListener('mousedown', (event) => {
   service.send(event);

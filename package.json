@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/davidkpiano/frontend-masters-xstate-workshop#readme",
   "dependencies": {
+    "@xstate/inspect": "^0.4.1",
+    "ws": "^7.4.3",
     "xstate": "^4.9.1"
   },
   "devDependencies": {
