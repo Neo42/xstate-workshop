@@ -37,7 +37,7 @@ const resetPosition = assign({
   py: 0,
 });
 
-const dragDropMachine = createMachine({
+const createDragDropMachine = (user) => createMachine({
   initial: 'checkingAuth',
   context: {
     x: 0,
@@ -46,7 +46,7 @@ const dragDropMachine = createMachine({
     dy: 0,
     px: 0,
     py: 0,
-    user: undefined,
+    user,
   },
   states: {
     checkingAuth: {
@@ -97,7 +97,10 @@ const dragDropMachine = createMachine({
   },
 });
 
-const service = interpret(dragDropMachine, { devTools: true });
+const service = interpret(
+  createDragDropMachine({ name: 'Hao' }),
+  { devTools: true },
+);
 
 service.onTransition((state) => {
   elBox.dataset.state = state.value;
