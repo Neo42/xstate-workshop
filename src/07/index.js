@@ -55,7 +55,7 @@ const createDragDropMachine = (user) => createMachine({
           cond: isAuthorized,
           target: 'idle',
         },
-        'unauthorized',
+        { target: 'unauthorized' },
         ],
       },
     },

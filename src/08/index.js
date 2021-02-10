@@ -1,20 +1,19 @@
 import { createMachine, assign, interpret } from 'xstate';
+import { inspect } from '@xstate/inspect';
+
+inspect({ iframe: false });
 
 const elBox = document.querySelector('#box');
 const elBody = document.body;
 
 const assignPoint = assign({
-  px: (context, event) => event.clientX,
-  py: (context, event) => event.clientY,
+  px: (event) => event.clientX,
+  py: (event) => event.clientY,
 });
 
 const assignPosition = assign({
-  x: (context, event) => {
-    return context.x + context.dx;
-  },
-  y: (context, event) => {
-    return context.y + context.dy;
-  },
+  x: (context) => context.x + context.dx,
+  y: (context) => context.y + context.dy,
   dx: 0,
   dy: 0,
   px: 0,
@@ -22,12 +21,8 @@ const assignPosition = assign({
 });
 
 const assignDelta = assign({
-  dx: (context, event) => {
-    return event.clientX - context.px;
-  },
-  dy: (context, event) => {
-    return event.clientY - context.py;
-  },
+  dx: (context, event) => event.clientX - context.px,
+  dy: (context, event) => event.clientY - context.py,
 });
 
 const resetPosition = assign({
@@ -63,7 +58,7 @@ const dragDropMachine = createMachine({
           internal: false,
         },
         mouseup: {
-          actions: [assignPosition],
+          actions: assignPosition,
           target: 'idle',
         },
         'keyup.escape': {
@@ -71,14 +66,17 @@ const dragDropMachine = createMachine({
           actions: resetPosition,
         },
       },
-      // Transition to 'idle' after 2 seconds
-      // using a delayed transition.
-      // ...
+      after: {
+        2000: {
+          target: 'idle',
+          actions: resetPosition,
+        },
+      },
     },
   },
 });
 
-const service = interpret(dragDropMachine);
+const service = interpret(dragDropMachine, { devTools: true });
 
 service.onTransition((state) => {
   elBox.dataset.state = state.value;
@@ -105,8 +103,8 @@ elBody.addEventListener('mouseup', (event) => {
   service.send(event);
 });
 
-elBody.addEventListener('keyup', (e) => {
-  if (e.key === 'Escape') {
+elBody.addEventListener('keyup', (event) => {
+  if (event.key === 'Escape') {
     service.send('keyup.escape');
   }
 });
