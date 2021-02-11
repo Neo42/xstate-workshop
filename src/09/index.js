@@ -76,11 +76,6 @@ const dragDropMachine = createMachine({
           },
         },
       },
-      // Add hierarchical (nested) states here.
-      // We should have a state for normal operation
-      // that transitions to a "locked" x-axis behavior
-      // when the shift key is pressed.
-      // ...
       on: {
         mousemove: {
           actions: assignDelta,
