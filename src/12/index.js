@@ -1,5 +1,7 @@
 import { inspect } from '@xstate/inspect';
-import { createMachine, assign, interpret } from 'xstate';
+import {
+  createMachine, assign, interpret, send,
+} from 'xstate';
 
 inspect({ iframe: false });
 
@@ -27,11 +29,29 @@ const machine = createMachine({
     pending: {
       on: {
         CANCEL: 'idle',
+        I_AM_DONE: 'resolved',
+        SEND_IT_ALREADY: {
+          actions: send({
+            type: 'SEND_IT_ALREADY',
+          }, {
+            to: 'child',
+          }),
+        },
       },
       invoke: {
         // Invoke your promise here.
         // The `src` should be a function that returns the source.
-        src: randomFetch,
+        id: 'child',
+        src: (context, event) => (sendBack, receive) => {
+          receive((e) => {
+            if (e.type === 'SEND_IT_ALREADY') {
+              sendBack({
+                type: 'I_AM_DONE',
+              });
+            }
+          });
+        },
+        // randomFetch,
         onDone: {
           target: 'resolved',
           actions: (_, event) => console.log(event),
@@ -70,5 +90,5 @@ elBox.addEventListener('click', () => {
 });
 
 elCancel.addEventListener('click', () => {
-  service.send('CANCEL');
+  service.send('SEND_IT_ALREADY');
 });
